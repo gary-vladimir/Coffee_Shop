@@ -82,7 +82,19 @@ def get_token_auth_header():
 
 
 def check_permissions(permission, payload):
-    raise Exception("Not Implemented")
+    if "permissions" not in payload:
+        raise AuthError(
+            {
+                "error": "invalid_claims",
+                "description": "Permissions are not included in JWT",
+            },
+            400,
+        )
+    if permission not in payload["permissions"]:
+        raise AuthError(
+            {"error": "forbidden", "description": "Permission not found"}, 403
+        )
+    return True
 
 
 """
