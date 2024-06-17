@@ -35,7 +35,37 @@ class AuthError(Exception):
 
 
 def get_token_auth_header():
-    raise Exception("Not Implemented")
+    auth = request.headers.get("Authorization", None)
+    if not auth:
+        raise AuthError(
+            {
+                "error": "authorization_header_missing",
+                "description": "Authorization header is expected",
+            },
+            401,
+        )
+    parts = auth.split()
+    if len(parts) > 2:
+        raise AuthError(
+            {
+                "error": "invalid_header",
+                "description": "Authorization header must be Bearer token",
+            },
+            401,
+        )
+    elif len(parts) == 1:
+        raise AuthError(
+            {"error": "invalid_header", "description": "Token not found"}, 401
+        )
+    elif parts[0].lower() != "bearer":
+        raise AuthError(
+            {
+                "error": "invalid_header",
+                "description": "Authorization header must start with Bearer",
+            },
+            401,
+        )
+    return parts[1]
 
 
 """
