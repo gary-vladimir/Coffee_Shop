@@ -198,3 +198,12 @@ def resource_not_found(error):
 @TODO implement error handler for AuthError
     error handler should conform to general task above
 """
+
+
+@app.errorhandler(AuthError)
+def handle_auth_error(e):
+    response = jsonify(
+        {"success": False, "error": e.status_code, "message": e.error["description"]}
+    )
+    response.status_code = e.status_code
+    return response
