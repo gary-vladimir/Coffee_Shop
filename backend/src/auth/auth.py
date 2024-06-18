@@ -113,7 +113,61 @@ def check_permissions(permission, payload):
 
 
 def verify_decode_jwt(token):
-    raise Exception("Not Implemented")
+    jsonurl = urlopen(f"https://{AUTH0_DOMAIN}")
+    jwks = json.loads(jsonurl.read())
+    unverified_header = jwt.get_unverified_header(token)
+    rsa_key = {}
+    if "kid" not in unverified_header:
+        raise AuthError(
+            {"error": "invalid_header", "description": "Authorization malformed"}, 401
+        )
+
+    for key in jwks["keys"]:
+        if key["kid"] == unverified_header["kid"]:
+            rsa_key = {
+                "kty": key["kty"],
+                "kid": key["kid"],
+                "use": key["use"],
+                "n": key["n"],
+                "e": key["e"],
+            }
+
+    if rsa_key:
+        try:
+            payload = jwt.decode(
+                token,
+                rsa_key,
+                algorithms=ALGORITHMS,
+                audience=API_AUDIENCE,
+                issuer=f"https://{AUTH0_DOMAIN}/",
+            )
+            return payload
+
+        except jwt.ExpiredSignatureError:
+            raise AuthError(
+                {"error": "token_expired", "description": "Token is expired"}, 401
+            )
+        except jwt.JWTClaimsError:
+            raise AuthError(
+                {
+                    "error": "invalid_claims",
+                    "description": "Incorrect claims. Please, check the audience and issuer",
+                },
+                401,
+            )
+        except Exception:
+            raise AuthError(
+                {
+                    "error": "invalid_header",
+                    "description": "Unable to parse authentication token.",
+                },
+                401,
+            )
+
+    raise AuthError(
+        {"error": "invalid_header", "description": "Unable to find appropriate key"},
+        401,
+    )
 
 
 """
