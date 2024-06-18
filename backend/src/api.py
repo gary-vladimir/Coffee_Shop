@@ -107,6 +107,30 @@ def create_drink(payload):
 """
 
 
+@app.route("/drinks/<int:id>", methods=["PATCH"])
+@requires_auth("patch:drinks")
+def update_drink(payload, id):
+    body = request.get_json()
+    if not body:
+        abort(400, description="Request does not contain a valid JSON body")
+    title = body.get("title", None)
+    recipe = body.get("recipe", None)
+
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+        if drink is None:
+            abort(404, description=f"Drink with id {id} was not found")
+        if title:
+            drink.title = title
+        if recipe:
+            drink.recipe = json.dumps(recipe)
+        drink.update()
+        return jsonify({"success": True, "Drinks": [drink.long()]}), 200
+    except Exception as e:
+        print(e)
+        abort(500)
+
+
 """
 @TODO implement endpoint
     DELETE /drinks/<id>
@@ -117,6 +141,21 @@ def create_drink(payload):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 """
+
+
+@app.route("/drinks/<int:id>", method=["DELETE"])
+@requires_auth("delete:drinks")
+def delete_drink(payload, id):
+    try:
+        drink = Drink.query.filter(Drink.id == id).one_or_none()
+        if drink is None:
+            abort(404, description=f"Drink with id {id} was not found")
+        drink.delete()
+        return jsonify({"success": True, "delete": id}), 200
+
+    except Exception as e:
+        print(e)
+        abort(500)
 
 
 # Error Handling
