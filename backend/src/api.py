@@ -74,6 +74,26 @@ def get_drinks_detail(payload):
 """
 
 
+@app.route("/drinks", methods=["POST"])
+@requires_auth("post:drinks")
+def create_drink(payload):
+    body = request.get_json()
+    if not body:
+        abort(400, description="Request does not contain a valid JSON body")
+    title = body.get("title", None)
+    recipe = body.get("recipe", None)
+
+    if not title or not recipe:
+        abort(400, description="Title and Recipe are required fields")
+    try:
+        new_drink = Drink(title=title, recipe=json.dumps(recipe))
+        new_drink.insert()
+        return jsonify({"success": True, "drinks": [new_drink.long()]}), 200
+    except Exception as e:
+        print(e)
+        abort(500)
+
+
 """
 @TODO implement endpoint
     PATCH /drinks/<id>
