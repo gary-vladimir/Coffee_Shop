@@ -51,6 +51,18 @@ def get_drinks():
 """
 
 
+@app.route("/drinks-detail", methods=["GET"])
+@requires_auth("get:drinks-detail")
+def get_drinks_detail(payload):
+    try:
+        drinks = Drink.query.all()
+        drinks_long = [drink.long() for drink in drinks]
+        return jsonify({"success": True, "drinks": drinks_long}), 200
+    except Exception as e:
+        print(e)
+        abort(500)
+
+
 """
 @TODO implement endpoint
     POST /drinks
