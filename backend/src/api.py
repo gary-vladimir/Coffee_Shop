@@ -30,7 +30,7 @@ CORS(app)
 """
 
 
-@app.route("drinks", methods=["GET"])
+@app.route("/drinks", methods=["GET"])
 def get_drinks():
     try:
         drinks = Drink.query.all()
@@ -143,7 +143,7 @@ def update_drink(payload, id):
 """
 
 
-@app.route("/drinks/<int:id>", method=["DELETE"])
+@app.route("/drinks/<int:id>", methods=["DELETE"])
 @requires_auth("delete:drinks")
 def delete_drink(payload, id):
     try:
