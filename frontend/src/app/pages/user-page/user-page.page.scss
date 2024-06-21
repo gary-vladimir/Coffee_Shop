@@ -1,0 +1,18 @@
+ion-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+ion-header,
+ion-toolbar {
+    z-index: 2;
+}
+
+ion-button {
+    z-index: 3;
+    position: relative;
+}

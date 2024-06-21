@@ -16,4 +16,7 @@ export class UserPagePage implements OnInit {
   ngOnInit() {
   }
 
+  public login() {
+    window.location.href = this.loginURL;
+  }
 }
