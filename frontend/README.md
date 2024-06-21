@@ -24,6 +24,9 @@ npm install
 
 > _tip_: **npm i** is shorthand for **npm install**
 
+> WARNING, if you get an error trying the line above try ```npm install --legacy-peer-deps```
+instead
+
 ## Required Tasks
 
 ### Configure Environment Variables
