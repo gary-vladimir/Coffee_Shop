@@ -23,7 +23,7 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  entryComponents: [DrinkFormComponent],
-  declarations: [DrinkMenuPage, DrinkGraphicComponent, DrinkFormComponent],
+  declarations: [DrinkMenuPage, DrinkFormComponent, DrinkGraphicComponent]
 })
-export class DrinkMenuPageModule {}
+export class DrinkMenuPageModule { }
+
