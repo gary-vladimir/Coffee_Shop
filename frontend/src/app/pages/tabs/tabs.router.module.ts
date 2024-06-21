@@ -4,29 +4,33 @@ import { TabsPage } from './tabs.page';
 
 const routes: Routes = [
   {
-    path: 'tabs',
+    path: '',
     component: TabsPage,
     children: [
-      { path: 'drink-menu', loadChildren: '../drink-menu/drink-menu.module#DrinkMenuPageModule' },
-      { path: 'user-page', loadChildren: '../user-page/user-page.module#UserPagePageModule' }, 
+      {
+        path: 'drink-menu',
+        loadChildren: () => import('../drink-menu/drink-menu.module').then(m => m.DrinkMenuPageModule)
+      },
+      {
+        path: 'user-page',
+        loadChildren: () => import('../user-page/user-page.module').then(m => m.UserPagePageModule)
+      },
       {
         path: '',
-        redirectTo: '/tabs/drink-menu',
+        redirectTo: 'drink-menu',
         pathMatch: 'full'
       }
     ]
   },
   {
     path: '',
-    redirectTo: '/tabs/drink-menu',
+    redirectTo: 'tabs',
     pathMatch: 'full'
   }
 ];
 
 @NgModule({
-  imports: [
-    RouterModule.forChild(routes)
-  ],
+  imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class TabsPageRoutingModule {}
+export class TabsPageRoutingModule { }
