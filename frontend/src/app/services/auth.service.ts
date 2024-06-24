@@ -4,7 +4,6 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { environment } from '../../environments/environment';
 
 const JWTS_LOCAL_KEY = 'JWTS_LOCAL_KEY';
-const JWTS_ACTIVE_INDEX_KEY = 'JWTS_ACTIVE_INDEX_KEY';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +17,10 @@ export class AuthService {
   token: string;
   payload: any;
 
-  constructor() { }
+  constructor() {
+    console.log('AuthService initialized');
+    this.load_jwts(); // Ensure we load JWTs on initialization
+  }
 
   build_login_link(callbackPath = '') {
     let link = 'https://';
@@ -31,28 +33,30 @@ export class AuthService {
     return link;
   }
 
-  // invoked in app.component on load
   check_token_fragment() {
-    // parse the fragment
     const fragment = window.location.hash.substr(1).split('&')[0].split('=');
-    // check if the fragment includes the access token
-    if ( fragment[0] === 'access_token' ) {
-      // add the access token to the jwt
+    console.log('Checking token fragment:', fragment);
+    if (fragment[0] === 'access_token') {
       this.token = fragment[1];
-      // save jwts to localstore
+      console.log('Token found in URL fragment:', this.token);
       this.set_jwt();
+      window.location.hash = ''; // Clear the hash to prevent reprocessing
     }
   }
 
   set_jwt() {
+    console.log('Setting JWT:', this.token);
     localStorage.setItem(JWTS_LOCAL_KEY, this.token);
+    sessionStorage.setItem(JWTS_LOCAL_KEY, this.token);
     if (this.token) {
       this.decodeJWT(this.token);
     }
   }
 
   load_jwts() {
-    this.token = localStorage.getItem(JWTS_LOCAL_KEY) || null;
+    console.log('Loading JWTs from storage');
+    this.token = sessionStorage.getItem(JWTS_LOCAL_KEY) || localStorage.getItem(JWTS_LOCAL_KEY) || null;
+    console.log('Loaded JWT:', this.token);
     if (this.token) {
       this.decodeJWT(this.token);
     }
@@ -65,13 +69,29 @@ export class AuthService {
   decodeJWT(token: string) {
     const jwtservice = new JwtHelperService();
     this.payload = jwtservice.decodeToken(token);
+    console.log('Decoded JWT payload:', this.payload);
     return this.payload;
   }
 
+  login() {
+    console.log('Redirecting to login');
+    window.location.href = this.build_login_link('/tabs/user-page');
+  }
+
   logout() {
+    console.log('Logging out, clearing JWT');
+    sessionStorage.removeItem(JWTS_LOCAL_KEY);
+    localStorage.removeItem(JWTS_LOCAL_KEY);
     this.token = '';
     this.payload = null;
-    this.set_jwt();
+    console.log('JWT after logout:', {
+      token: this.token,
+      payload: this.payload,
+    });
+    console.log('Storage after logout:', {
+      sessionStorage: sessionStorage.getItem(JWTS_LOCAL_KEY),
+      localStorage: localStorage.getItem(JWTS_LOCAL_KEY),
+    });
   }
 
   can(permission: string) {
