@@ -127,7 +127,7 @@ def update_drink(payload, id):
         if recipe:
             drink.recipe = json.dumps(recipe)
         drink.update()
-        return jsonify({"success": True, "Drinks": [drink.long()]}), 200
+        return jsonify({"success": True, "drinks": [drink.long()]}), 200
     except Exception as e:
         print(e)
         abort(500)
